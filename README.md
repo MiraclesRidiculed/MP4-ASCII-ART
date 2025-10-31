@@ -103,4 +103,4 @@ If you publish this repository on GitHub, update the README author line or commi
 
 ---
 
-Happy ASCII-ing! Replace any placeholders in this README (author, license) before publishing.
+Happy ASCII-ing! 

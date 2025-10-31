@@ -260,94 +260,48 @@ def browse_output():
         entry_output.delete(0, tk.END)
         entry_output.insert(0, path)
 
+root = tk.Tk()
+root.title("🎞 ASCII Video Converter")
+root.geometry("480x420")
+root.resizable(False, False)
 
-def _run_headless(args):
-    # Helper to run convert_video from CLI without GUI dialogs
-    input_path = args.input
-    output_path = args.output or "ascii_out.mp4"
-    cols = args.cols or 120
-    fps = args.fps or 0
-    font_size = args.font_size or 12
-    save_mode = True
-    merge_audio_opt = args.merge_audio
-    convert_video(input_path, output_path, cols, fps, font_size, save_mode, merge_audio_opt, show_dialogs=False)
+tk.Label(root, text="Video File:").pack(anchor="w", padx=10, pady=4)
+frame_video = tk.Frame(root)
+frame_video.pack(fill="x", padx=10)
+entry_video = tk.Entry(frame_video)
+entry_video.pack(side="left", fill="x", expand=True)
+tk.Button(frame_video, text="Browse", command=browse_video).pack(side="right")
 
+tk.Label(root, text="Output File:").pack(anchor="w", padx=10, pady=4)
+frame_out = tk.Frame(root)
+frame_out.pack(fill="x", padx=10)
+entry_output = tk.Entry(frame_out)
+entry_output.pack(side="left", fill="x", expand=True)
+tk.Button(frame_out, text="Browse", command=browse_output).pack(side="right")
 
-def main():
-    import argparse
+tk.Label(root, text="Columns (Width):").pack(anchor="w", padx=10, pady=2)
+entry_cols = tk.Entry(root)
+entry_cols.insert(0, "120")
+entry_cols.pack(fill="x", padx=10)
 
-    parser = argparse.ArgumentParser(description="ASCII Video Converter (GUI + CLI)")
-    parser.add_argument("--input", "-i", help="Input video path")
-    parser.add_argument("--output", "-o", help="Output video path (default ascii_out.mp4)")
-    parser.add_argument("--cols", type=int, default=120, help="Columns (width) for ASCII art")
-    parser.add_argument("--fps", type=float, default=0, help="FPS (0 = use source fps)")
-    parser.add_argument("--font-size", type=int, default=12, help="Font size used when saving frames as images")
-    parser.add_argument("--merge-audio", action="store_true", help="Merge original audio using ffmpeg")
-    parser.add_argument("--no-gui", action="store_true", help="Run in headless CLI mode (requires --input)")
+tk.Label(root, text="FPS (0 = auto):").pack(anchor="w", padx=10, pady=2)
+entry_fps = tk.Entry(root)
+entry_fps.insert(0, "0")
+entry_fps.pack(fill="x", padx=10)
 
-    args = parser.parse_args()
-    if args.no_gui:
-        if not args.input:
-            parser.error("--input is required when using --no-gui")
-        _run_headless(args)
-    else:
-        # If input was provided without --no-gui, still launch GUI (user can use fields)
-        run_gui()
+tk.Label(root, text="Font Size (for save mode):").pack(anchor="w", padx=10, pady=2)
+entry_font = tk.Entry(root)
+entry_font.insert(0, "12")
+entry_font.pack(fill="x", padx=10)
 
+var_mode = tk.StringVar(value="terminal")
+tk.Label(root, text="Mode:").pack(anchor="w", padx=10, pady=4)
+tk.Radiobutton(root, text="Play in Terminal", variable=var_mode, value="terminal").pack(anchor="w", padx=20)
+tk.Radiobutton(root, text="Save as MP4", variable=var_mode, value="save").pack(anchor="w", padx=20)
 
-if __name__ == "__main__":
-    main()
+var_audio = tk.BooleanVar(value=True)
+tk.Checkbutton(root, text="Merge Original Audio (FFmpeg)", variable=var_audio).pack(anchor="w", padx=20, pady=6)
 
-def run_gui():
-    root = tk.Tk()
-    root.title("🎞 ASCII Video Converter")
-    root.geometry("480x420")
-    root.resizable(False, False)
+tk.Button(root, text="▶ Start", bg="#4CAF50", fg="white", font=("Arial", 12, "bold"), command=start_conversion).pack(pady=10)
 
-    tk.Label(root, text="Video File:").pack(anchor="w", padx=10, pady=4)
-    frame_video = tk.Frame(root)
-    frame_video.pack(fill="x", padx=10)
-    global entry_video
-    entry_video = tk.Entry(frame_video)
-    entry_video.pack(side="left", fill="x", expand=True)
-    tk.Button(frame_video, text="Browse", command=browse_video).pack(side="right")
-
-    tk.Label(root, text="Output File:").pack(anchor="w", padx=10, pady=4)
-    frame_out = tk.Frame(root)
-    frame_out.pack(fill="x", padx=10)
-    global entry_output
-    entry_output = tk.Entry(frame_out)
-    entry_output.pack(side="left", fill="x", expand=True)
-    tk.Button(frame_out, text="Browse", command=browse_output).pack(side="right")
-
-    tk.Label(root, text="Columns (Width):").pack(anchor="w", padx=10, pady=2)
-    global entry_cols
-    entry_cols = tk.Entry(root)
-    entry_cols.insert(0, "120")
-    entry_cols.pack(fill="x", padx=10)
-
-    tk.Label(root, text="FPS (0 = auto):").pack(anchor="w", padx=10, pady=2)
-    global entry_fps
-    entry_fps = tk.Entry(root)
-    entry_fps.insert(0, "0")
-    entry_fps.pack(fill="x", padx=10)
-
-    tk.Label(root, text="Font Size (for save mode):").pack(anchor="w", padx=10, pady=2)
-    global entry_font
-    entry_font = tk.Entry(root)
-    entry_font.insert(0, "12")
-    entry_font.pack(fill="x", padx=10)
-
-    global var_mode
-    var_mode = tk.StringVar(value="terminal")
-    tk.Label(root, text="Mode:").pack(anchor="w", padx=10, pady=4)
-    tk.Radiobutton(root, text="Play in Terminal", variable=var_mode, value="terminal").pack(anchor="w", padx=20)
-    tk.Radiobutton(root, text="Save as MP4", variable=var_mode, value="save").pack(anchor="w", padx=20)
-
-    global var_audio
-    var_audio = tk.BooleanVar(value=True)
-    tk.Checkbutton(root, text="Merge Original Audio (FFmpeg)", variable=var_audio).pack(anchor="w", padx=20, pady=6)
-
-    tk.Button(root, text="▶ Start", bg="#4CAF50", fg="white", font=("Arial", 12, "bold"), command=start_conversion).pack(pady=10)
-
-    root.mainloop()
+root.mainloop()
